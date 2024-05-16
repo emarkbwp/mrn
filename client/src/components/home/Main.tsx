@@ -8,8 +8,8 @@ import { getAllCart } from "hooks/asyncStore";
 import { useFocusEffect } from "@react-navigation/native";
 import { useSelector } from "react-redux";
 import CarousalSkeleton from "../ui/skeletons/slider-skeleton";
-const ProductsWrap = lazy(() => import("../ui/productCardsWrap"));
-const Carousal = lazy(() => import("./carousal"));
+import ProductsWrap from "components/ui/productCardsWrap";
+import Carousal from "./carousal";
 
 export default function Main() {
   const [cartTotal, setCartTotal] = useState(0);

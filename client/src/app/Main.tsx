@@ -1,10 +1,10 @@
-import React, { useCallback, useEffect, useState } from "react";
+import React, { useCallback } from "react";
 import { NavigationContainer } from "@react-navigation/native";
 import { useFonts } from "expo-font";
 import * as SplashScreen from "expo-splash-screen";
 import AuthNavigator from "navigation/authNavigator";
 import AdminNavigator from "navigation/adminNavigator";
-import { LogBox, View, Text } from "react-native";
+import { LogBox} from "react-native";
 import Provider from "../redux/provider";
 import { useSelector } from "react-redux";
 import { useLoadUserQuery } from "redux/features/api/apiSlice";

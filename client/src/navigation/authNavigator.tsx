@@ -1,12 +1,12 @@
 import React from "react";
 import { createNativeStackNavigator } from "@react-navigation/native-stack";
-import { SignIn } from "../screens/login";
-import signup from "screens/signup";
-import { verification } from "screens/verification";
-import { NativeStackNavigationProp } from "react-native-screens/lib/typescript/native-stack/types";
+import { SignIn } from "../screens/login"; // Corrected import
+import Signup from "../screens/signup"; // Corrected import
+import { Verification } from "screens/verification";
+import Check from "../screens/check"; // Corrected import
+import ForgotPassword from "../screens/forgotPassword"; // Corrected import
+import { NativeStackNavigationProp } from "@react-navigation/native-stack";
 import { RouteProp } from "@react-navigation/native";
-import Check from "screens/check";
-import ForgotPassword from "screens/forgotPassword";
 
 const Stack = createNativeStackNavigator();
 
@@ -23,7 +23,7 @@ export type AuthScreensParams = {
   [AuthScreens.StackSignup]: undefined;
   [AuthScreens.StackVerification]: undefined;
   [AuthScreens.StackCheck]: undefined;
-  [AuthScreens.StackForgot]: {param:string,loggedIn?:boolean};
+  [AuthScreens.StackForgot]: { param: string; loggedIn?: boolean }; // Corrected type
 };
 
 export type AuthScreensProps<
@@ -43,10 +43,10 @@ const AuthNavigator = () => {
       }}
     >
       <Stack.Screen name={AuthScreens.StackLogin} component={SignIn} />
-      <Stack.Screen name={AuthScreens.StackSignup} component={signup} />
+      <Stack.Screen name={AuthScreens.StackSignup} component={Signup} />
       <Stack.Screen
         name={AuthScreens.StackVerification}
-        component={verification}
+        component={Verification}
       />
       <Stack.Screen name={AuthScreens.StackCheck} component={Check} />
       <Stack.Screen name={AuthScreens.StackForgot} component={ForgotPassword} />

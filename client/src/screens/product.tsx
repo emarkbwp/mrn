@@ -1,5 +1,5 @@
 import React, { Suspense, lazy } from "react";
-const Main = lazy(() => import("../components/product/Main"));
+import Main from "../components/product/Main"
 import { useRoute } from "@react-navigation/native";
 import { MainScreens, MainScreensRouteProps } from "navigation/mainNavigator";
 import ProductSkeleton from "../components/ui/skeletons/product-skeleton";

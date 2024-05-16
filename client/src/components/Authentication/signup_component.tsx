@@ -27,7 +27,7 @@ const initialForm = {
   mobile: "",
   password: "",
 };
-const Main = () => {
+const SignupComponent = () => {
   const navigation = useNavigation<AuthScreensProps>();
   const [errors, setErrors] = useState<Partial<ISignup>>({});
   const [form, setForm] = useState<Partial<ISignup>>(initialForm);
@@ -318,4 +318,4 @@ const Main = () => {
   );
 };
 
-export default Main;
+export default SignupComponent;

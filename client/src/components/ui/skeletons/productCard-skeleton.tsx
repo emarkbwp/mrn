@@ -1,7 +1,7 @@
 import { View, useWindowDimensions } from "react-native";
 import React from "react";
 
-const productCardSkeleton = () => {
+const ProductCardSkeleton = () => {
   const width = useWindowDimensions().width;
   return (
     <View className="flex flex-row flex-wrap justify-between">
@@ -69,4 +69,4 @@ const productCardSkeleton = () => {
   );
 };
 
-export default productCardSkeleton;
+export default ProductCardSkeleton;

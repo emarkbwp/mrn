@@ -1,5 +1,4 @@
 {
-  "extends": "expo/tsconfig.base",
   "compilerOptions": {
     "baseUrl": "./src",
     "paths": {
@@ -7,9 +6,7 @@
         "*",
         "src/*"
       ]
-    },
-    "jsx": "react-native",
-    "moduleResolution": "node",
-    "module": "es2020"
-  }
+    }
+  },
+  "extends": "expo/tsconfig.base"
 }

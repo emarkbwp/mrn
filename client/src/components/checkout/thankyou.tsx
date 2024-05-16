@@ -4,9 +4,7 @@ import React from 'react';
 import { useNavigation } from '@react-navigation/native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import LottieView from 'lottie-react-native';
-import { MainScreenProps, MainScreens } from 'navigation/mainNavigator';
 import { BottomNavigator, BottomNavigatorProps } from 'navigation/bottomNavigator';
-import { BottomNavigatorNavigationProp, BottomNavigatorRouteProps } from 'navigation/bottomNavigatorAdmin';
 
 const Main = () => {
   const navigation = useNavigation<BottomNavigatorProps>();

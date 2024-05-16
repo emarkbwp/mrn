@@ -6,7 +6,7 @@ export const apiSlice = createApi({
   reducerPath: "api",
   baseQuery: fetchBaseQuery({
     baseUrl:
-      "https://potential-succotash-q7v9wwq9w4r4fxvg7-5000.app.github.dev/api/v1",
+      "https://pocket-pharma-945886e3a8c7.herokuapp.com/api/v1",
     prepareHeaders: (headers, { getState }) => {
       const { accessToken, refreshToken } = (getState() as RootState).auth;
       console.log("tkdfj",accessToken,refreshToken)

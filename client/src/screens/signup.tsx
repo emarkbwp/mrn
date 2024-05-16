@@ -1,10 +1,10 @@
 import Main from "../components/Authentication/signup_component";
 import React from 'react'
 
-const signup = () => {
+const Signup = () => {
     return (
         <Main />
     )
 }
 
-export default signup
+export default Signup

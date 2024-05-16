@@ -29,7 +29,7 @@ const initialForm = {
   password: "",
 };
 
-const Main = () => {
+const LoginComponent = () => {
   const navigation = useNavigation<AuthScreensProps>();
   const [form, setForm] = React.useState<Partial<ILogin>>(initialForm);
   const [errors, setErrors] = React.useState<Partial<ILogin>>({});
@@ -281,4 +281,4 @@ const Main = () => {
   );
 };
 
-export default Main;
+export default LoginComponent;

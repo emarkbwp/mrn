@@ -13,7 +13,7 @@ import ProductCardSkeleton from "components/ui/skeletons/productCard-skeleton";
 import SearchTop from "components/ui/searchHeader";
 import { useSelector } from "react-redux";
 import { IProducts } from "types/data";
-const ProductCardsWrap = lazy(() => import("../ui/productCardsWrap"));
+import ProductsWrap from "components/ui/productCardsWrap";
 
 export default function Main() {
   const [search, setSearch] = React.useState("");
@@ -146,7 +146,7 @@ export default function Main() {
           </Text>
           <View className="p-5">
             <Suspense fallback={<ProductCardSkeleton />}>
-              <ProductCardsWrap products={products} />
+              <ProductsWrap products={products} />
             </Suspense>
           </View>
         </ScrollView>

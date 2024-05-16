@@ -1,6 +1,6 @@
-import { Main } from "../components/Authentication/verification_component";
+import { VerificationComponent } from "components/Authentication/verification_component";
 import React from "react";
 
-export const verification = () => {
-  return <Main />;
+export const Verification = () => {
+  return <VerificationComponent />;
 };

@@ -17,7 +17,7 @@ import { Ionicons } from "@expo/vector-icons";
 import { AuthScreens, AuthScreensProps } from "navigation/authNavigator";
 import Loader from "components/ui/loader";
 
-export const Main = () => {
+export const VerificationComponent = () => {
   const [code, setCode] = useState(["", "", "", ""]);
   const { accessToken } = useSelector((state: any) => state.auth) || {};
   const [active, { isSuccess, data, error, isLoading }] =
