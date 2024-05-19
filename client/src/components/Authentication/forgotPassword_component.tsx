@@ -14,34 +14,55 @@ import React, { useEffect, useState } from "react";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { Ionicons } from "@expo/vector-icons";
 import { useNavigation } from "@react-navigation/native";
-import { useChangePasswordMutation } from "redux/features/auth/authApi";
+import {
+  useChangePasswordMutation,
+  useForgotPasswordMutation,
+} from "redux/features/auth/authApi";
 import { AuthScreens, AuthScreensProps } from "navigation/authNavigator";
 import { Colors } from "constants/index";
 import Loader from "components/ui/loader";
+import { useSelector } from "react-redux";
 
 const initialForm = {
-  oldPassword: "",
+  currentPassword: "",
+  newPassword: "",
+  confirmPassword: "",
+};
+
+const initialFormForgot = {
   newPassword: "",
   confirmPassword: "",
 };
 interface IForgot {
-  oldPassword: string;
+  currentPassword?: string;
   newPassword: string;
   confirmPassword: string;
 }
 
 type Props = {
-  email: string;
-  loggedIn?: boolean;
+  forgot?: boolean;
 };
 
-const ForgotPassword: React.FC<Props> = ({ email, loggedIn }) => {
+const ForgotPasswordComponent: React.FC<Props> = ({ forgot }) => {
   const navigation = useNavigation<AuthScreensProps>();
   const [errors, setErrors] = useState<Partial<IForgot>>({});
-  const [form, setForm] = useState<Partial<IForgot>>(initialForm);
+  const [form, setForm] = useState<Partial<IForgot>>(
+    forgot ? initialFormForgot : initialForm
+  );
+  const { accessToken, otp } = useSelector((state: any) => state.auth) || {};
+
   const [isKeyboardVisible, setIsKeyboardVisible] = useState(false);
   const [change, { isSuccess, error, data, isLoading }] =
     useChangePasswordMutation();
+  const [
+    changeForgot,
+    {
+      isSuccess: forgotSuccess,
+      error: forgotError,
+      isLoading: forgotLoading,
+      data: forgotData,
+    },
+  ] = useForgotPasswordMutation();
 
   const width = useWindowDimensions().width;
   const height = useWindowDimensions().height;
@@ -50,11 +71,12 @@ const ForgotPassword: React.FC<Props> = ({ email, loggedIn }) => {
     if (isSuccess) {
       const message = data?.message || "Password changed!";
       ToastAndroid.show(message, ToastAndroid.SHORT);
-      if (loggedIn) {
-        navigation.goBack();
-      } else {
-        navigation.navigate(AuthScreens.StackLogin);
-      }
+      navigation.goBack();
+    }
+    if (forgotSuccess) {
+      const message = forgotData?.message || "Password changed!";
+      ToastAndroid.show(message, ToastAndroid.SHORT);
+      navigation.navigate(AuthScreens.StackLogin);
     }
     if (error) {
       if ("data" in error) {
@@ -62,8 +84,21 @@ const ForgotPassword: React.FC<Props> = ({ email, loggedIn }) => {
         ToastAndroid.show(errorData.data.message, ToastAndroid.SHORT);
       }
     }
-  }, [isSuccess, error, data?.message]);
-
+    if (forgotError) {
+      if ("data" in forgotError) {
+        const errorData = forgotError as any;
+        ToastAndroid.show(errorData.data.message, ToastAndroid.SHORT);
+      }
+    }
+  }, [
+    isSuccess,
+    error,
+    data?.message,
+    forgotSuccess,
+    forgotError,
+    forgotData?.message,
+  ]);
+  
   useEffect(() => {
     const keyboardDidShowListener = Keyboard.addListener(
       "keyboardDidShow",
@@ -87,8 +122,10 @@ const ForgotPassword: React.FC<Props> = ({ email, loggedIn }) => {
 
   const validateForm = () => {
     let error: Partial<IForgot> = {};
-    if (form.oldPassword === "") {
-      error.oldPassword = "Old Password is required";
+    if (!forgot) {
+      if (form.currentPassword === "") {
+        error.currentPassword = "Current Password is required";
+      }
     }
     if (form.newPassword === "") {
       error.newPassword = "Must enter new password";
@@ -105,9 +142,17 @@ const ForgotPassword: React.FC<Props> = ({ email, loggedIn }) => {
     return Object.keys(error).length === 0;
   };
 
-  const handleSubmit = () => {
+  const handleSubmit = async () => {
     if (validateForm()) {
-      change({ ...form, email: email });
+      if (forgot) {
+        changeForgot({
+          ...form,
+          activation_token: accessToken,
+          activation_code: otp,
+        });
+      } else {
+        await change(form);
+      }
       setForm({});
       setErrors({});
     }
@@ -148,29 +193,31 @@ const ForgotPassword: React.FC<Props> = ({ email, loggedIn }) => {
                     >
                       Change Password
                     </Text>
-                    <TextInput
-                      selectionColor={Colors.primary}
-                      className={`rounded-md h-14 border  px-5 ${
-                        errors.oldPassword
-                          ? "border-red-500"
-                          : "border-gray-200"
-                      }`}
-                      placeholder="Old password"
-                      value={form.oldPassword}
-                      onChangeText={(text) =>
-                        setForm({ ...form, oldPassword: text })
-                      }
-                      secureTextEntry
-                    />
-                    {errors.oldPassword && (
-                      <Text
-                        className={`text-red-500 ${
-                          width > 400 ? "text-sm" : "text-xs"
-                        }`}
-                      >
-                        {errors.oldPassword}
-                      </Text>
+                    {!forgot && (
+                        <TextInput
+                          selectionColor={Colors.primary}
+                          className={`rounded-md h-14 border  px-5 ${
+                            errors.currentPassword
+                              ? "border-red-500"
+                              : "border-gray-200"
+                          }`}
+                          placeholder="Current password"
+                          value={form.currentPassword}
+                          onChangeText={(text) =>
+                            setForm({ ...form, currentPassword: text })
+                          }
+                          secureTextEntry
+                        />
                     )}
+                    {errors.currentPassword && (
+                          <Text
+                            className={`text-red-500 ${
+                              width > 400 ? "text-sm" : "text-xs"
+                            }`}
+                          >
+                            {errors.currentPassword}
+                          </Text>
+                        )}
                     <TextInput
                       selectionColor={Colors.primary}
                       className={`rounded-md h-14 border  px-5 ${
@@ -223,7 +270,7 @@ const ForgotPassword: React.FC<Props> = ({ email, loggedIn }) => {
                         style={{ fontFamily: "semiBold" }}
                         onPress={handleSubmit}
                       >
-                        Sign Up
+                        Change Password
                       </Text>
                     </TouchableOpacity>
                   </View>
@@ -237,4 +284,4 @@ const ForgotPassword: React.FC<Props> = ({ email, loggedIn }) => {
   );
 };
 
-export default ForgotPassword;
+export default ForgotPasswordComponent;

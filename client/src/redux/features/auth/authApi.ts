@@ -1,5 +1,10 @@
 import { apiSlice } from "../api/apiSlice";
-import { userRegistration, userLoggedIn, userLoggedOut } from "./authSlice";
+import {
+  userRegistration,
+  userLoggedIn,
+  userLoggedOut,
+  userOTP,
+} from "./authSlice";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 
 type RegistrationResponse = {
@@ -20,7 +25,7 @@ export const authApi = apiSlice.injectEndpoints({
       async onQueryStarted(arg, { queryFulfilled, dispatch }) {
         try {
           const result = await queryFulfilled;
-          console.log("redux result",result.data)
+          console.log("redux result", result.data);
 
           dispatch(
             userRegistration({
@@ -49,6 +54,18 @@ export const authApi = apiSlice.injectEndpoints({
         body: data,
         credentials: "include" as const,
       }),
+      async onQueryStarted(arg, { queryFulfilled, dispatch }) {
+        try {
+          const result = await queryFulfilled;
+          dispatch(
+            userRegistration({
+              token: result.data.activationToken,
+            })
+          );
+        } catch (error: any) {
+          console.log(error);
+        }
+      },
     }),
     login: builder.mutation({
       query: ({ email, password }) => ({
@@ -116,10 +133,26 @@ export const authApi = apiSlice.injectEndpoints({
     }),
     changePassword: builder.mutation({
       query: (body) => ({
-        url: "change-password",
-        method: "POST",
+        url: "update-password",
+        method: "PUT",
         credentials: "include" as const,
-        body:body
+        body: body,
+      }),
+    }),
+    verifyOTP: builder.mutation({
+      query: ({ activation_token, activation_code }) => ({
+        url: "verify-OTP",
+        method: "POST",
+        body: { activation_token, activation_code },
+        credentials: "include" as const,
+      })
+    }),
+    forgotPassword: builder.mutation({
+      query: (body) => ({
+        url: "forgot-password",
+        method: "PUT",
+        credentials: "include" as const,
+        body: body,
       }),
     }),
   }),
@@ -132,5 +165,7 @@ export const {
   useCheckMutation,
   useSocialAuthMutation,
   useLogoutQuery,
-  useChangePasswordMutation
+  useChangePasswordMutation,
+  useVerifyOTPMutation,
+  useForgotPasswordMutation,
 } = authApi;

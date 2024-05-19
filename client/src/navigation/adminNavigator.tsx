@@ -6,7 +6,7 @@ import EditProduct from "screens/adminScreens/editProduct";
 import { NativeStackNavigationProp } from "react-native-screens/lib/typescript/native-stack/types";
 import { RouteProp } from "@react-navigation/native";
 import ManageOrders from "screens/adminScreens/manageOrders";
-import ForgotPassword from "screens/forgotPassword";
+import UpdatePassword from "screens/updatePassword";
 
 const Stack = createNativeStackNavigator();
 
@@ -15,15 +15,15 @@ export enum AdminScreens {
   StackAddProduct = "AddProduct",
   StackEditProduct = "EditProduct",
   StackManageOrders = "ManageOrders",
-  StackForgot = "ForgotPassword",
+  StackUpdatePassword = "UpdatePassword",
 }
 
 export type AdminScreensParams = {
   [AdminScreens.StackAddProduct]: undefined;
   [AdminScreens.StackEditProduct]: { param: string };
   [AdminScreens.StackOverview]: undefined;
-  [AdminScreens.StackManageOrders]: { param: string};
-  [AdminScreens.StackForgot]: { param: string; loggedIn: boolean; };
+  [AdminScreens.StackManageOrders]: { param: string };
+  [AdminScreens.StackUpdatePassword]: undefined;
 };
 
 export type AdminScreensProps<
@@ -58,7 +58,10 @@ const AdminNavigator = () => {
         name={AdminScreens.StackManageOrders}
         component={ManageOrders}
       />
-         <Stack.Screen name={AdminScreens.StackForgot} component={ForgotPassword} />
+      <Stack.Screen
+        name={AdminScreens.StackUpdatePassword}
+        component={UpdatePassword}
+      />
     </Stack.Navigator>
   );
 };

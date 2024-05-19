@@ -4,12 +4,14 @@ interface AuthState {
   user: string;
   accessToken: string;
   refreshToken: string;
+  otp: string;
 }
 
 const initialState: AuthState = {
   user: "",
   accessToken: "",
   refreshToken: "",
+  otp: "",
 };
 
 const authSlice = createSlice({
@@ -18,6 +20,9 @@ const authSlice = createSlice({
   reducers: {
     userRegistration: (state, action: PayloadAction<{ token: string }>) => {
       state.accessToken = action.payload.token;
+    },
+    userOTP: (state, action: PayloadAction<{ otp: string }>) => {
+      state.otp = action.payload.otp;
     },
     userLoggedIn: (
       state,
@@ -39,6 +44,6 @@ const authSlice = createSlice({
   },
 });
 
-export const { userRegistration, userLoggedIn, userLoggedOut } =
+export const { userRegistration, userLoggedIn, userLoggedOut, userOTP } =
   authSlice.actions;
 export default authSlice.reducer;

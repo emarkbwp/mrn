@@ -1,17 +1,25 @@
 import { Text, View, StatusBar, Image, TouchableOpacity } from "react-native";
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { MaterialIcons } from "@expo/vector-icons";
 import { useNavigation } from "@react-navigation/native";
 import { useLogoutQuery } from "redux/features/auth/authApi";
 import { useSelector } from "react-redux";
 import { AdminScreens, AdminScreensProps } from "navigation/adminNavigator";
+import AsyncStorage from "@react-native-async-storage/async-storage";
 
 export function AccountsAdmin() {
   const navigation = useNavigation<AdminScreensProps<AdminScreens>>();
   const [logout, setLogout] = useState(false);
   const {} = useLogoutQuery(undefined, { skip: !logout ? true : false });
   const { user } = useSelector((state: any) => state.auth);
+
+  useEffect(() => {
+    const removeTokens = async () => {
+      return await AsyncStorage.multiRemove(["accessToken", "refreshToken"]);
+    };
+    removeTokens();
+  }, [logout]);
 
   return (
     <SafeAreaView className="flex-1">
@@ -53,10 +61,7 @@ export function AccountsAdmin() {
             {user.socialProfile !== true && (
               <TouchableOpacity
                 onPress={() =>
-                  navigation.navigate(AdminScreens.StackForgot, {
-                    param: user.email,
-                    loggedIn: true,
-                  })
+                  navigation.navigate(AdminScreens.StackUpdatePassword)
                 }
                 className="flex flex-row items-center gap-5 border-b border-gray-200 py-4"
               >

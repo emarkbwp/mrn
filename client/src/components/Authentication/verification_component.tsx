@@ -10,21 +10,41 @@ import {
 } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { MaterialCommunityIcons } from "@expo/vector-icons";
-import { useActivationMutation } from "redux/features/auth/authApi";
-import { useSelector } from "react-redux";
+import {
+  useActivationMutation,
+  useVerifyOTPMutation,
+} from "redux/features/auth/authApi";
+import { useSelector, useDispatch } from "react-redux";
 import { useNavigation } from "@react-navigation/native";
 import { Ionicons } from "@expo/vector-icons";
 import { AuthScreens, AuthScreensProps } from "navigation/authNavigator";
 import Loader from "components/ui/loader";
+import { userOTP } from "redux/features/auth/authSlice";
 
-export const VerificationComponent = () => {
+type Props = {
+  forgotVerification?: boolean;
+};
+
+export const VerificationComponent: React.FC<Props> = ({
+  forgotVerification,
+}) => {
   const [code, setCode] = useState(["", "", "", ""]);
   const { accessToken } = useSelector((state: any) => state.auth) || {};
   const [active, { isSuccess, data, error, isLoading }] =
     useActivationMutation();
+  const [
+    verify,
+    {
+      isSuccess: verifySuccess,
+      error: verifyError,
+      data: verifyData,
+      isLoading: verifyLoading,
+    },
+  ] = useVerifyOTPMutation();
   const inputRefs = useRef([]);
   const navigation = useNavigation<AuthScreensProps>();
   const width = useWindowDimensions().width;
+  const dispatch = useDispatch();
 
   useEffect(() => {
     if (isSuccess) {
@@ -32,19 +52,45 @@ export const VerificationComponent = () => {
       ToastAndroid.show(message, ToastAndroid.SHORT);
       navigation.navigate(AuthScreens.StackLogin);
     }
+    if (verifySuccess) {
+      const message = verifyData.message || "OTP verified";
+      ToastAndroid.show(message, ToastAndroid.SHORT);
+      navigation.navigate(AuthScreens.StackForgotPassword);
+    }
     if (error) {
       if ("data" in error) {
         const errorData = error as any;
         ToastAndroid.show(errorData.data.message, ToastAndroid.SHORT);
       }
     }
-  }, [isSuccess, error, data?.message]);
+    if (verifyError) {
+      if ("data" in verifyError) {
+        const errorData = verifyError as any;
+        ToastAndroid.show(errorData.data.message, ToastAndroid.SHORT);
+      }
+    }
+  }, [
+    isSuccess,
+    error,
+    data?.message,
+    verifyData?.message,
+    verifyError,
+    verifySuccess,
+  ]);
 
-  const handleSubmit = async () => {
-    await active({
-      activation_code: code[0] + code[1] + code[2] + code[3],
-      activation_token: accessToken,
-    });
+  const handleSubmit = () => {
+    if (forgotVerification) {
+      dispatch(userOTP({ otp: code[0] + code[1] + code[2] + code[3] }));
+      verify({
+        activation_code: code[0] + code[1] + code[2] + code[3],
+        activation_token: accessToken,
+      });
+    } else {
+      active({
+        activation_code: code[0] + code[1] + code[2] + code[3],
+        activation_token: accessToken,
+      });
+    }
   };
   const handleCodeChange = (text, index) => {
     const newCode = [...code];

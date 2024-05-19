@@ -8,7 +8,7 @@ import { redis } from "../config/redis.config";
 export const isAuthenticated = catchAsyncErrors(
   async (req: Request, res: Response, next: NextFunction) => {
     const authHeader = req.headers.authorization;
-    console.log("jjjj"+authHeader)
+    console.log("isAuth"+authHeader)
     if (!authHeader || !authHeader.startsWith("Bearer ")) {
       return next(new ErrorHandler("Please provide a valid JWT token", 401));
     }

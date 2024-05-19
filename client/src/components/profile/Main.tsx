@@ -97,10 +97,7 @@ export default function Main() {
             {user.socialProfile !== true && (
               <TouchableOpacity
                 onPress={() =>
-                  navigation.navigate(MainScreens.StackForgot, {
-                    param: user.email,
-                    loggedIn: true,
-                  })
+                  navigation.navigate(MainScreens.StackUpdatePassword)
                 }
                 className="flex flex-row items-center gap-5 border-b border-gray-200 py-4"
               >

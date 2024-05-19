@@ -11,8 +11,9 @@ import {
   getAllUsers,
   deleteUser,
   updateProfileInfo,
-  changePassword,
   check,
+  verifyOTP,
+  forgotPassword,
 } from "../controllers/user.controller";
 import { isAuthenticated, isAuthorized } from "../middlewares/auth.middleware";
 
@@ -24,6 +25,8 @@ userRouter.get("/logout", updateAccessToken, isAuthenticated, logout);
 userRouter.get("/refresh", updateAccessToken);
 userRouter.get("/me", updateAccessToken, isAuthenticated, getUserInfo);
 userRouter.post("/check", check);
+userRouter.post("/verify-OTP", verifyOTP);
+userRouter.put("/forgot-password", forgotPassword);
 userRouter.put(
   "/update-profile-info",
   updateAccessToken,
@@ -44,7 +47,6 @@ userRouter.get(
   isAuthorized("admin"),
   getAllUsers
 );
-userRouter.post("/change-password", changePassword);
 userRouter.delete(
   "/delete-user/:id",
   updateAccessToken,

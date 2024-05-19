@@ -28,7 +28,7 @@ const CheckComponent = () => {
 
   useEffect(() => {
     if (isSuccess) {
-      navigation.navigate(AuthScreens.StackForgot, { param: email });
+      navigation.navigate(AuthScreens.StackForgotVerification);
     }
     if (error) {
       if ("data" in error) {

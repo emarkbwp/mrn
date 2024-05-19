@@ -176,10 +176,8 @@ export const updateAccessToken = async (
   next: NextFunction
 ) => {
   try {
-  
     const refresh_token = req.headers["refresh_token"] as string;
-    console.log("working")
-    console.log(refresh_token)
+    console.log("refreshtoken is",refresh_token);
     const decoded = jwt.verify(
       refresh_token,
       process.env.REFRESH_TOKEN_SECRET as string
@@ -348,42 +346,74 @@ export const deleteUser = catchAsyncErrors(
   }
 );
 
-export const changePassword = catchAsyncErrors(
+export const check = catchAsyncErrors(
   async (req: Request, res: Response, next: NextFunction) => {
     try {
-      const data = req.body;
-      const { oldPassword, newPassword, confirmPassword, email } = data;
-      if (!oldPassword || !newPassword || !confirmPassword || !email) {
-        return next(new ErrorHandler("Please fill all fields", 400));
+      const { email } = req.body;
+      console.log(email);
+      if (!email) {
+        return next(new ErrorHandler("Please enter any email", 400));
       }
-      const userExist = await User.findOne({ email }).select("+password");
-
-      if (!userExist) {
-        return next(new ErrorHandler("User does not exist. Sign up!", 400));
+      const existingUser = await User.findOne({ email }).select("password");
+      console.log(existingUser);
+      if (!existingUser) {
+        return next(new ErrorHandler("No account on this email ,Signup!", 400));
       }
-      if (userExist.password === undefined) {
-        return next(new ErrorHandler("Invalid User - (social-login)", 400));
-      }
-      const isPasswordMatched = await userExist.comparePassword(oldPassword);
-      if (!isPasswordMatched) {
-        return next(new ErrorHandler("Invalid email or password", 400));
-      }
-      if (newPassword !== confirmPassword) {
-        return next(new ErrorHandler("Both passwords must be the same", 400));
-      }
-      if (confirmPassword.length < 8) {
+      if (existingUser.password === undefined) {
         return next(
           new ErrorHandler(
-            "Minimum 8 characters are required for the password",
+            "You have Social acount,Login with Social Login",
             400
           )
         );
       }
-      userExist.password = confirmPassword;
-      await userExist.save();
+      const activationToken = OTPToken(existingUser); //otp & user
+      const activationOTP = activationToken.OTP;
+
+      const data = { name: { name: existingUser.name }, activationOTP };
+      const html = await ejs.renderFile(
+        path.join(__dirname, "../views/mail-templates/", "activationMail.ejs"),
+        data
+      );
+      try {
+        await sendEmail({
+          email: email,
+          subject: "Email Verification",
+          template: "activationMail.ejs",
+          data,
+        });
+
+        res.status(201).json({
+          success: true,
+          message: `Please check your email: ${existingUser.email} to change your password`,
+          activationToken: activationToken.token,
+        });
+      } catch (error: any) {
+        console.log("error occur");
+        return next(new ErrorHandler(error.message, 400));
+      }
+    } catch (e: any) {
+      return next(new ErrorHandler(e.message, 400));
+    }
+  }
+);
+
+export const verifyOTP = catchAsyncErrors(
+  async (req: Request, res: Response, next: NextFunction) => {
+    try {
+      const { activation_token, activation_code }: IActivationRequest =
+        req.body;
+
+      const newUser: { user: IUser; OTP: string } = jwt.verify(
+        activation_token,
+        process.env.JWT_SECRET as Secret
+      ) as { user: IUser; OTP: string };
+      if (newUser.OTP !== activation_code) {
+        return next(new ErrorHandler("Invalid activation code", 400));
+      }
       res.status(200).json({
         success: true,
-        message: "Password updated successfully",
+        message: "OTP verified",
       });
     } catch (e: any) {
       return next(new ErrorHandler(e.message, 400));
@@ -391,20 +421,55 @@ export const changePassword = catchAsyncErrors(
   }
 );
 
-export const check = catchAsyncErrors(
+export const forgotPassword = catchAsyncErrors(
   async (req: Request, res: Response, next: NextFunction) => {
     try {
-      const { email } = req.body;
-      if (!email) {
-        return next(new ErrorHandler("Please enter any email", 400));
+      const {
+        activation_token,
+        activation_code,
+        newPassword,
+        confirmPassword,
+      } = req.body;
+      console.log(req.body);
+      if (!activation_code || !activation_token) {
+        return next(new ErrorHandler("Tokens not found", 400));
       }
-      const existingUser = await User.findOne({ email });
-      if (!existingUser) {
-        return next(new ErrorHandler("No account on this email ,Signup!", 400));
+      if (!newPassword || !confirmPassword) {
+        return next(new ErrorHandler("Please fill all fields", 400));
       }
+      const newUser: { user: IUser; OTP: string } = jwt.verify(
+        activation_token,
+        process.env.JWT_SECRET as Secret
+      ) as { user: IUser; OTP: string };
+      if (newUser.OTP !== activation_code) {
+        return next(new ErrorHandler("Invalid activation code", 400));
+      }
+
+      if (!newUser.user) {
+        return next(new ErrorHandler("User does not exist", 400));
+      }
+      if (newPassword !== confirmPassword) {
+        return next(new ErrorHandler("Both passwords must be the same", 400));
+      }
+      if (confirmPassword.length < 7) {
+        return next(
+          new ErrorHandler(
+            "Minimum 8 characters are required for the password",
+            400
+          )
+        );
+      }
+      const userExist = await User.findById(newUser.user._id).select(
+        "+password"
+      );
+      if (!userExist) {
+        return next(new ErrorHandler("user not found", 400));
+      }
+      userExist.password = confirmPassword;
+      await userExist.save();
       res.status(200).json({
-        message: "Email Verified",
         success: true,
+        message: "Password updated successfully",
       });
     } catch (e: any) {
       return next(new ErrorHandler(e.message, 400));

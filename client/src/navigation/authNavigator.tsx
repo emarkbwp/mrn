@@ -1,12 +1,13 @@
 import React from "react";
 import { createNativeStackNavigator } from "@react-navigation/native-stack";
-import { SignIn } from "../screens/login"; // Corrected import
-import Signup from "../screens/signup"; // Corrected import
+import { SignIn } from "../screens/login"; 
+import Signup from "../screens/signup"; 
 import { Verification } from "screens/verification";
-import Check from "../screens/check"; // Corrected import
-import ForgotPassword from "../screens/forgotPassword"; // Corrected import
+import Check from "../screens/check";
 import { NativeStackNavigationProp } from "@react-navigation/native-stack";
 import { RouteProp } from "@react-navigation/native";
+import ForgotVerification from "screens/forgotVerfication";
+import ForgotPassword from "screens/forgotPassword";
 
 const Stack = createNativeStackNavigator();
 
@@ -15,7 +16,8 @@ export enum AuthScreens {
   StackSignup = "Signup",
   StackVerification = "Verification",
   StackCheck = "Check",
-  StackForgot = "Forgot",
+  StackForgotVerification = "ForgotVerification",
+  StackForgotPassword = "ForgotPassword",
 }
 
 export type AuthScreensParams = {
@@ -23,7 +25,8 @@ export type AuthScreensParams = {
   [AuthScreens.StackSignup]: undefined;
   [AuthScreens.StackVerification]: undefined;
   [AuthScreens.StackCheck]: undefined;
-  [AuthScreens.StackForgot]: { param: string; loggedIn?: boolean }; // Corrected type
+  [AuthScreens.StackForgotVerification]: undefined;
+  [AuthScreens.StackForgotPassword]: undefined;
 };
 
 export type AuthScreensProps<
@@ -49,7 +52,14 @@ const AuthNavigator = () => {
         component={Verification}
       />
       <Stack.Screen name={AuthScreens.StackCheck} component={Check} />
-      <Stack.Screen name={AuthScreens.StackForgot} component={ForgotPassword} />
+      <Stack.Screen
+        name={AuthScreens.StackForgotVerification}
+        component={ForgotVerification}
+      />
+      <Stack.Screen
+        name={AuthScreens.StackForgotPassword}
+        component={ForgotPassword}
+      />
     </Stack.Navigator>
   );
 };

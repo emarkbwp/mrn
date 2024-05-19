@@ -11,7 +11,7 @@ import {
 } from "../screens";
 import BottomNavigation, { BottomNavigator } from "./bottomNavigator";
 import { RouteProp } from "@react-navigation/native";
-import ForgotPassword from "screens/forgotPassword";
+import UpdatePassword from "screens/updatePassword";
 
 const Stack = createNativeStackNavigator();
 
@@ -22,17 +22,17 @@ export enum MainScreens {
   StackOrderPlace = "OrderPlace",
   StackOrders = "Orders",
   StackFavourite = "Favourite",
-  StackForgot = "ForgotPassword",
+  StackUpdatePassword = "UpdatePassword",
 }
 
 export type MainScreensParams = {
   [MainScreens.StackCart]: undefined;
-  [MainScreens.StackProduct]: {param:string};
+  [MainScreens.StackProduct]: { param: string };
   [MainScreens.StackCheckout]: undefined;
   [MainScreens.StackOrderPlace]: undefined;
   [MainScreens.StackOrders]: undefined;
   [MainScreens.StackFavourite]: undefined;
-  [MainScreens.StackForgot]: { param: string; loggedIn: boolean; };
+  [MainScreens.StackUpdatePassword]: undefined;
 };
 
 export type MainScreenProps<
@@ -56,7 +56,10 @@ const MainNavigator = () => {
       <Stack.Screen name={MainScreens.StackOrderPlace} component={OrderPlace} />
       <Stack.Screen name={MainScreens.StackOrders} component={Orders} />
       <Stack.Screen name={MainScreens.StackFavourite} component={Favourite} />
-      <Stack.Screen name={MainScreens.StackForgot} component={ForgotPassword} />
+      <Stack.Screen
+        name={MainScreens.StackUpdatePassword}
+        component={UpdatePassword}
+      />
     </Stack.Navigator>
   );
 };
